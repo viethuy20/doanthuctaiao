@@ -1,0 +1,169 @@
+
+//di chuyen cua dong vat
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class fox : MonoBehaviour
+{
+    static Animation ani;
+    public Transform[] path;
+    public float speed = 1.0f;
+    public float reach = 1.8f;
+    public int poit = 0;
+    AudioSource a1;
+    AudioSource a2;
+    public Transform b;
+    public AudioClip s1;
+    public AudioClip s2;
+
+    
+
+    void aw()
+    {
+
+
+        a1 = gameObject.AddComponent<AudioSource>();
+        a1.loop = true;
+        a1.clip = s1;
+        a1.volume = 0.1f;
+        a1.maxDistance = 70.0f;
+        a1.pitch = Random.Range(0.5f, 1.5f);
+        a1.playOnAwake = false;
+        a1.mute = true;
+        a1.Play();
+
+        a2 = gameObject.AddComponent<AudioSource>();
+        a2.loop = true;
+        a2.mute = true;
+        a2.clip = s2;
+        a2.volume = 0.4f;
+        a2.maxDistance = 70.0f;
+        a2.playOnAwake = false;
+        a2.pitch = Random.Range(-1, 2);
+       
+        a2.Play();
+
+    }
+    void Start()
+    {
+        aw();
+        ani = GetComponent<Animation>();
+    }
+    
+    void Update()
+    {
+        interac();
+        
+    }
+    void dis()
+    {
+        
+        ani.Play("run");
+        float dist = Vector3.Distance(path[poit].position, transform.position);
+        
+        transform.LookAt(path[poit].position);
+        transform.Translate(Vector3.forward * speed * Time.deltaTime * 0.5f);
+        if (dist <= reach)
+        {
+            poit=poit+1;
+            if (poit >= path.Length)
+            {
+                poit = 0;
+            }
+        }
+       
+    }
+    float distance;
+    void interac()
+    {
+        
+        distance = Vector3.Distance(b.position, transform.position);
+
+        if (distance > 40.0f)
+        {
+            a1.mute = false;
+            
+            dis();
+
+        }
+        if (distance <= 40.0f && distance >=20.0f)
+        {
+
+           
+            a2.mute = false;
+            transform.LookAt(b.position);
+           
+             ani.Play("bite");
+
+        }
+        if (distance <= 20.0f)
+        {
+
+          
+            a1.mute = false;
+            transform.LookAt(-b.position);
+           
+            ani.Play("run");
+
+        }
+        if (distance > 50.0f) a2.mute = true;
+        if (distance > 90.0f) a1.mute = true;
+    }
+
+}
+
+
+
+
+//di chuen cua play
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ch : MonoBehaviour {
+    public Transform Camera;
+    public float tog = 30.0f;
+    public float speed = 3.0f;
+    public bool move;
+    private CharacterController cc;
+    AudioSource b1;
+    AudioSource b2;
+    public AudioClip s;
+    // Use this for initialization
+    void Start () {
+        cc = GetComponent<CharacterController>();
+        ae();
+	}
+	void ae()
+    {
+        b1 = gameObject.AddComponent<AudioSource>();
+        b1.loop = true;
+        b1.clip = s;
+        b1.volume = 0.1f;
+        b1.maxDistance = 70.0f;
+        b1.pitch = 0.7f;
+        b1.playOnAwake = false;
+        b1.mute = true;
+        b1.Play();
+
+    }
+    // Update is called once per frame
+    void Update () {
+        if (Camera.eulerAngles.x >= tog && Camera.eulerAngles.x < 90.0f)
+        {
+            move = true;
+        }
+        else move = false;
+        if (move)
+        {
+            Vector3 forward = Camera.TransformDirection(Vector3.forward);
+            cc.SimpleMove(forward * speed);
+        }
+        if (move) b1.mute = false;
+        if(!move) b1.mute =true;   
+	}
+    
+
+}
